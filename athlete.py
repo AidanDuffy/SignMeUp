@@ -6,6 +6,7 @@ Description: This class is for the athlete, storing their YMCA sign in link
 and their YMCA barcode ID number.
 """
 
+
 class Athlete:
 
     def __init__(self, sign_in_url, barcode, location, first, last, month, day,
