@@ -5,7 +5,9 @@ Last Updated: January 2, 2021
 Description: This program aids swimmers in scheduling/booking lap swim times
 for local YMCAs in the northern New Jersey area.
 """
+from datetime import datetime
 import os
+from datetime import date
 
 import appJar
 import requests
@@ -15,6 +17,8 @@ from selenium.webdriver.support.select import Select
 from athlete import Athlete
 
 info_app = appJar.gui("YMCA Sign-in and Personal Info", "800x800")
+weekdays = {0:"Monday", 1:"Tuesday", 2:"Wednesday", 3:"Thursday", 4:"Friday",
+            5:"Saturday", 6:"Sunday"}
 
 def check_user_info():
     """
@@ -39,7 +43,7 @@ def check_user_info():
                 return get_barcode_info()
         url = "https://operations.daxko.com/online/5029/checkin?area_id="
         athlete = Athlete(info[0], int(info[1]), info[2], info[3], info[4],
-                          int(info[5]), int(info[6]), int(info[7]), info[8],
+                          info[5], int(info[6]), int(info[7]), info[8],
                           int(info[9]))
         return athlete
     else:
@@ -113,7 +117,8 @@ def get_athlete_info():
     user info file.
     :return: None
     """
-    info_app = appJar.gui("Athlete Info", "600x600")
+    info_app = appJar.gui("Athlete Info", "800x800")
+    info_app.setFont(20)
     info_app.addLabel("title",
                       "Please provide your personal information below:")
     user_info = open("user_info.txt", "r")
@@ -147,11 +152,17 @@ def get_athlete_info():
         for line in location_file:
             locations.append(line)
     location_file.close()
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+              "Oct",
+              "Nov", "Dec"]
+    days = list()
+    for i in range(1, 32):
+        days.append(i)
     info_app.addLabelOptionBox("Location", locations)
     info_app.addLabelEntry("First Name")
     info_app.addLabelEntry("Last Name")
-    info_app.addLabelSpinBoxRange("Birthday Month", 1, 12)
-    info_app.addLabelSpinBoxRange("Birthday Day", 1, 31)
+    info_app.addLabelOptionBox("Birthday Month", months)
+    info_app.addLabelOptionBox("Birthday Day", days)
     info_app.addLabelNumericEntry("Birthday Year")
     info_app.addLabelEntry("Email")
     info_app.addLabelNumericEntry("Phone Number(Digits only!)")
@@ -176,8 +187,8 @@ def get_athlete_info():
                         info_app.go()
                 first = info_app.getEntry("First Name")
                 last = info_app.getEntry("Last Name")
-                month = info_app.getSpinBox("Birthday Month")
-                day = info_app.getSpinBox("Birthday Day")
+                month = info_app.getOptionBox("Birthday Month")
+                day = info_app.getOptionBox("Birthday Day")
                 year = int(info_app.getEntry("Birthday Year"))
                 if year > 2021 or year < 1921:
                     if info_app.retryBox("Error", "Please enter a valid birth "
@@ -224,6 +235,71 @@ def main():
     athlete = check_user_info()
     if athlete is False:
         athlete = get_barcode_info()
+    today = date.today()
+    now = datetime.now()
+    weekday = weekdays[today.weekday()]
+    current_time = now.strftime("%I:%M %p")
+    info_app.setFont(20)
+    info_app.addLabel("title",
+                      "What time next " + weekday + " after " + current_time +
+                      " do\n you want to make your reservation?")
+    info_app.addLabelNumericEntry("Time (HHMM, military style)")
+    def press_res(button):
+        """
+        This is the function that executes a button push for athlete info
+        window
+        :param button: is the button being pressed.
+        :param app: is the application
+        :return: None
+        """
+        if button == "Cancel":
+            info_app.stop()
+        elif button == "Submit":
+            while True:
+                time = str(int(info_app.getEntry("Time (HHMM, military"
+                                                 " style)")))
+                if len(time) == 3:
+                    time = "0" + time
+                if len(time) != 4:
+                    if info_app.retryBox("Error","Please enter a valid time!"):
+                        info_app.go()
+                hour = time[:2]
+                min = time[2:]
+                if int(hour)>23 or int(hour)<0 or int(min)>59 or int(min)<0:
+                    if info_app.retryBox("Error","Please enter a valid time!"):
+                        info_app.go()
+                if int(hour) <= int(current_time[:2]) and int(min) < int(
+                        current_time[2:]):
+                    if info_app.retryBox("Error","Please enter a valid time!"):
+                        info_app.go()
+                break
+            reservation = open("res.txt","w")
+            reservation.write(hour + min)
+            reservation.close()
+            info_app.stop()
+
+    info_app.addButtons(["Submit", "Cancel"], press_res)
+    info_app.go()
+    reservation = open("res.txt", "r")
+    res_time = reservation.read()
+    hour = res_time[:2]
+    mins = res_time[2:]
+    if int(hour) >= 12:
+        am_or_pm = "PM"
+        if int(hour) > 12:
+            hour = str(int(hour) - 12)
+    else:
+        am_or_pm = "AM"
+    res_time = hour + ":" + mins + " " + am_or_pm
+    #res_date =
+    print(res_time)
+    today_date = int(today.__str__()[-2:])
+    today_date += 7
+    if today_date < 10:
+        res_date = "0" + str(today_date)
+    else:
+        res_date = str(today_date)
+    res_date = today.__str__()[:-2] + res_date
 
 
 if __name__ == '__main__':
