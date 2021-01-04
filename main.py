@@ -40,7 +40,7 @@ def check_user_info():
         url = "https://operations.daxko.com/online/5029/checkin?area_id="
         athlete = Athlete(info[0], int(info[1]), info[2], info[3], info[4],
                           int(info[5]), int(info[6]), int(info[7]), info[8],
-                          info[9])
+                          int(info[9]))
         return athlete
     else:
         return False
@@ -74,8 +74,8 @@ def get_barcode_info():
                 area_id = info_app.getEntry(
                     "Area ID(4-digits at end of Virtual"
                     " Check In URL)")
-                url = "https://operations.daxko.com/online/5029/checkin?area_id=" \
-                      + area_id
+                url = "https://operations.daxko.com/online/5029/checkin?" \
+                      "area_id=" + area_id
                 barcode = int(info_app.getEntry("Barcode ID"))
                 barcode = str(barcode)
                 try:
@@ -132,9 +132,10 @@ def get_athlete_info():
         driver = webdriver.Chrome(executable_path=chrome_path)
         driver.get(page.url)
         driver.implicitly_wait(1)
-        driver.switch_to.frame(driver.find_element_by_xpath("/html/body/div[7]/"
-                                                            "div/div[2]/div[2]/"
-                                                            "div/div[2]/p/iframe"))
+        driver.switch_to.frame(driver.find_element_by_xpath("/html/body/div[7]"
+                                                            "/div/div[2]/div"
+                                                            "[2]/div/div[2]"
+                                                            "/p/iframe"))
         driver.implicitly_wait(1)
         selector = Select(driver.find_element_by_id("location"))
         for option in selector.options:
@@ -154,9 +155,11 @@ def get_athlete_info():
     info_app.addLabelNumericEntry("Birthday Year")
     info_app.addLabelEntry("Email")
     info_app.addLabelNumericEntry("Phone Number(Digits only!)")
+
     def press_athlete(button):
         """
-        This is the function that executes a button push for athlete info window
+        This is the function that executes a button push for athlete info
+        window
         :param button: is the button being pressed.
         :param app: is the application
         :return: None
@@ -175,7 +178,7 @@ def get_athlete_info():
                 last = info_app.getEntry("Last Name")
                 month = info_app.getSpinBox("Birthday Month")
                 day = info_app.getSpinBox("Birthday Day")
-                year = info_app.getEntry("Birthday Year")
+                year = int(info_app.getEntry("Birthday Year"))
                 if year > 2021 or year < 1921:
                     if info_app.retryBox("Error", "Please enter a valid birth "
                                                   "year!"):
@@ -185,15 +188,15 @@ def get_athlete_info():
                     if info_app.retryBox("Error",
                                          "Please enter a valid email!"):
                         info_app.go()
-                number = info_app.getEntry("Phone Number(Digits only!)")
+                number = int(info_app.getEntry("Phone Number(Digits only!)"))
                 if len(str(number)) != 10:
                     if info_app.retryBox("Error", "Please enter a valid phone "
                                                   "number!"):
                         info_app.go()
                 break
             user_info.write(loc + "\n" + first + "\n" + last + "\n" + month
-                            + "\n" + day + "\n" + year + "\n"
-                            + email + "\n" + number)
+                            + "\n" + day + "\n" + str(year) + "\n"
+                            + email + "\n" + str(number))
             user_info.close()
             info_app.stop()
 
