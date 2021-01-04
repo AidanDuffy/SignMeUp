@@ -46,89 +46,6 @@ def check_user_info():
         return False
 
 
-def press(button):
-    """
-    This is the function that executes a button push
-    :param button: is the button being pressed.
-    :param app: is the application
-    :return: None
-    """
-    if button == "Cancel":
-        info_app.stop()
-    elif button == "Submit":
-        user_info = open("user_info.txt", "w")
-        while True:
-            area_id = info_app.getEntry("Area ID(4-digits at end of Virtual"
-                                        " Check In URL)")
-            url = "https://operations.daxko.com/online/5029/checkin?area_id=" \
-                  + area_id
-            barcode = int(info_app.getEntry("Barcode ID"))
-            barcode = str(barcode)
-            try:
-                check_in_page = requests.get(url)
-                check_in_page_content = check_in_page.content
-            except requests.exceptions.MissingSchema:
-                print("Error: Please enter a URL!")
-            if "operations.daxko.com" not in url:
-                if info_app.retryBox("Error", "You input an invalid URL,"
-                                              " try again!"):
-                    info_app.go()
-            if len(barcode) < 9:
-                if info_app.retryBox("Error", "Your barcode is too short!"):
-                    info_app.go()
-            elif len(barcode) > 9:
-                if info_app.retryBox("Error", "Your barcode is too long!"):
-                    info_app.go()
-            else:
-
-                break
-        user_info.write(area_id + "\n" + barcode + "\n")
-        user_info.close()
-        info_app.stop()
-
-
-def press_athlete(button):
-    """
-    This is the function that executes a button push for athlete info window
-    :param button: is the button being pressed.
-    :param app: is the application
-    :return: None
-    """
-    if button == "Cancel":
-        info_app.stop()
-    elif button == "Submit":
-        user_info = open("user_info.txt", "a")
-        while True:
-            loc = info_app.getOptionBox("Location")
-            if loc == "Select Location":
-                if info_app.retryBox("Error", "Please select a valid "
-                                              "location!"):
-                    info_app.go()
-            first = info_app.getEntry("First Name")
-            last = info_app.getEntry("Last Name")
-            month = info_app.getSpinBox("Birthday Month")
-            day = info_app.getSpinBox("Birthday Day")
-            year = info_app.getEntry("Birthday Year")
-            if year > 2021 or year < 1921:
-                if info_app.retryBox("Error", "Please enter a valid birth "
-                                              "year!"):
-                    info_app.go()
-            email = info_app.getEntry("Email")
-            if "@" not in email:
-                if info_app.retryBox("Error", "Please enter a valid email!"):
-                    info_app.go()
-            number = info_app.getEntry("Phone Number(Digits only!)")
-            if len(str(number)) != 10:
-                if info_app.retryBox("Error","Please enter a valid phone "
-                                             "number!"):
-                    info_app.go()
-            break
-        user_info.write(loc + "\n" + first + "\n" + last + "\n" + month
-                        + "\n" + day + "\n" + year + "\n"
-                        + email + "\n" + number)
-        user_info.close()
-        info_app.stop()
-
 def get_barcode_info():
     """
     This asks the user for their sign-in page and barcode ID and populates the
@@ -141,6 +58,49 @@ def get_barcode_info():
     info_app.addLabelEntry("Area ID(4-digits at end of Virtual Check In URL)")
     info_app.addNumericLabelEntry("Barcode ID")
     info_app.setFocus("Area ID(4-digits at end of Virtual Check In URL)")
+
+    def press(button):
+        """
+        This is the function that executes a button push
+        :param button: is the button being pressed.
+        :param app: is the application
+        :return: None
+        """
+        if button == "Cancel":
+            info_app.stop()
+        elif button == "Submit":
+            user_info = open("user_info.txt", "w")
+            while True:
+                area_id = info_app.getEntry(
+                    "Area ID(4-digits at end of Virtual"
+                    " Check In URL)")
+                url = "https://operations.daxko.com/online/5029/checkin?area_id=" \
+                      + area_id
+                barcode = int(info_app.getEntry("Barcode ID"))
+                barcode = str(barcode)
+                try:
+                    check_in_page = requests.get(url)
+                    check_in_page_content = check_in_page.content
+                except requests.exceptions.MissingSchema:
+                    print("Error: Please enter a URL!")
+                if "operations.daxko.com" not in url:
+                    if info_app.retryBox("Error", "You input an invalid URL,"
+                                                  " try again!"):
+                        info_app.go()
+                if len(barcode) < 9:
+                    if info_app.retryBox("Error",
+                                         "Your barcode is too short!"):
+                        info_app.go()
+                elif len(barcode) > 9:
+                    if info_app.retryBox("Error", "Your barcode is too long!"):
+                        info_app.go()
+                else:
+
+                    break
+            user_info.write(area_id + "\n" + barcode + "\n")
+            user_info.close()
+            info_app.stop()
+
     info_app.addButtons(["Submit", "Cancel"], press)
     info_app.go()
     get_athlete_info()
@@ -194,6 +154,49 @@ def get_athlete_info():
     info_app.addLabelNumericEntry("Birthday Year")
     info_app.addLabelEntry("Email")
     info_app.addLabelNumericEntry("Phone Number(Digits only!)")
+    def press_athlete(button):
+        """
+        This is the function that executes a button push for athlete info window
+        :param button: is the button being pressed.
+        :param app: is the application
+        :return: None
+        """
+        if button == "Cancel":
+            info_app.stop()
+        elif button == "Submit":
+            user_info = open("user_info.txt", "a")
+            while True:
+                loc = info_app.getOptionBox("Location")
+                if loc == "Select Location":
+                    if info_app.retryBox("Error", "Please select a valid "
+                                                  "location!"):
+                        info_app.go()
+                first = info_app.getEntry("First Name")
+                last = info_app.getEntry("Last Name")
+                month = info_app.getSpinBox("Birthday Month")
+                day = info_app.getSpinBox("Birthday Day")
+                year = info_app.getEntry("Birthday Year")
+                if year > 2021 or year < 1921:
+                    if info_app.retryBox("Error", "Please enter a valid birth "
+                                                  "year!"):
+                        info_app.go()
+                email = info_app.getEntry("Email")
+                if "@" not in email:
+                    if info_app.retryBox("Error",
+                                         "Please enter a valid email!"):
+                        info_app.go()
+                number = info_app.getEntry("Phone Number(Digits only!)")
+                if len(str(number)) != 10:
+                    if info_app.retryBox("Error", "Please enter a valid phone "
+                                                  "number!"):
+                        info_app.go()
+                break
+            user_info.write(loc + "\n" + first + "\n" + last + "\n" + month
+                            + "\n" + day + "\n" + year + "\n"
+                            + email + "\n" + number)
+            user_info.close()
+            info_app.stop()
+
     info_app.addButtons(["Submit", "Cancel"], press_athlete)
     info_app.go()
 
