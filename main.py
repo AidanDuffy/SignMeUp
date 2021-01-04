@@ -107,6 +107,7 @@ def get_barcode_info():
     user info file with that info.
     :return: the athlete object
     """
+    info_app.setFont(20)
     info_app.addLabel("title",
                       "Please provide your YMCA and login information")
     info_app.addLabelEntry("Area ID(4-digits at end of Virtual Check In URL)")
@@ -138,9 +139,17 @@ def get_athlete_info():
     chrome_path = path + "\\chromedriver.exe"
     driver = webdriver.Chrome(executable_path=chrome_path)
     driver.get(page.url)
-    selector = Select(driver.find_element_by_name('location'))
-    print(selector.options)
-    info_app.addLabelEntry("")
+    driver.implicitly_wait(1)
+    driver.switch_to.frame(driver.find_element_by_xpath("/html/body/div[7]/"
+                                                        "div/div[2]/div[2]/"
+                                                        "div/div[2]/p/iframe"))
+    driver.implicitly_wait(1)
+    selector = Select(driver.find_element_by_id("location"))
+    locations = list()
+    for option in selector.options:
+        locations.append(option.text)
+    driver.close()
+    info_app.addLabelOptionBox("Location", locations)
     info_app.addLabelEntry("First Name")
     info_app.addLabelEntry("Last Name")
     info_app.addLabelEntry("Birthday Month")
