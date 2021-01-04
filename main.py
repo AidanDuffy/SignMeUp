@@ -14,8 +14,7 @@ from selenium.webdriver.support.select import Select
 
 from athlete import Athlete
 
-info_app = appJar.gui("YMCA Sign-in and Personal Info", "600x600")
-
+info_app = appJar.gui("YMCA Sign-in and Personal Info", "800x800")
 
 def check_user_info():
     """
@@ -98,8 +97,37 @@ def press_athlete(button):
     if button == "Cancel":
         info_app.stop()
     elif button == "Submit":
-        print("Hi")
-
+        user_info = open("user_info.txt", "a")
+        while True:
+            loc = info_app.getOptionBox("Location")
+            if loc == "Select Location":
+                if info_app.retryBox("Error", "Please select a valid "
+                                              "location!"):
+                    info_app.go()
+            first = info_app.getEntry("First Name")
+            last = info_app.getEntry("Last Name")
+            month = info_app.getSpinBox("Birthday Month")
+            day = info_app.getSpinBox("Birthday Day")
+            year = info_app.getEntry("Birthday Year")
+            if year > 2021 or year < 1921:
+                if info_app.retryBox("Error", "Please enter a valid birth "
+                                              "year!"):
+                    info_app.go()
+            email = info_app.getEntry("Email")
+            if "@" not in email:
+                if info_app.retryBox("Error", "Please enter a valid email!"):
+                    info_app.go()
+            number = info_app.getEntry("Phone Number(Digits only!)")
+            if len(str(number)) != 10:
+                if info_app.retryBox("Error","Please enter a valid phone "
+                                             "number!"):
+                    info_app.go()
+            break
+        user_info.write(loc + "\n" + first + "\n" + last + "\n" + month
+                        + "\n" + day + "\n" + year + "\n"
+                        + email + "\n" + number)
+        user_info.close()
+        info_app.stop()
 
 def get_barcode_info():
     """
@@ -112,7 +140,7 @@ def get_barcode_info():
                       "Please provide your YMCA and login information")
     info_app.addLabelEntry("Area ID(4-digits at end of Virtual Check In URL)")
     info_app.addNumericLabelEntry("Barcode ID")
-    info_app.setFocus("Barcode URL(daxko.com)")
+    info_app.setFocus("Area ID(4-digits at end of Virtual Check In URL)")
     info_app.addButtons(["Submit", "Cancel"], press)
     info_app.go()
     get_athlete_info()
@@ -135,28 +163,37 @@ def get_athlete_info():
     user_info.close()
     url = "https://operations.daxko.com/online/5029/checkin?area_id=" + info[0]
     page = submit_barcode(url, info[1])
-    path, file = os.path.split(os.path.realpath(__file__))
-    chrome_path = path + "\\chromedriver.exe"
-    driver = webdriver.Chrome(executable_path=chrome_path)
-    driver.get(page.url)
-    driver.implicitly_wait(1)
-    driver.switch_to.frame(driver.find_element_by_xpath("/html/body/div[7]/"
-                                                        "div/div[2]/div[2]/"
-                                                        "div/div[2]/p/iframe"))
-    driver.implicitly_wait(1)
-    selector = Select(driver.find_element_by_id("location"))
+    location_file = open("locations.txt", "r")
     locations = list()
-    for option in selector.options:
-        locations.append(option.text)
-    driver.close()
+    if len(location_file.read()) == 0:
+        location_file = open("locations.txt", "w")
+        path, file = os.path.split(os.path.realpath(__file__))
+        chrome_path = path + "\\chromedriver.exe"
+        driver = webdriver.Chrome(executable_path=chrome_path)
+        driver.get(page.url)
+        driver.implicitly_wait(1)
+        driver.switch_to.frame(driver.find_element_by_xpath("/html/body/div[7]/"
+                                                            "div/div[2]/div[2]/"
+                                                            "div/div[2]/p/iframe"))
+        driver.implicitly_wait(1)
+        selector = Select(driver.find_element_by_id("location"))
+        for option in selector.options:
+            locations.append(option.text)
+            location_file.write(option.text + "\n")
+        driver.close()
+    else:
+        location_file = open("locations.txt", "r")
+        for line in location_file:
+            locations.append(line)
+    location_file.close()
     info_app.addLabelOptionBox("Location", locations)
     info_app.addLabelEntry("First Name")
     info_app.addLabelEntry("Last Name")
-    info_app.addLabelEntry("Birthday Month")
-    info_app.addLabelEntry("Birthday Day")
-    info_app.addLabelEntry("Birthday Year")
+    info_app.addLabelSpinBoxRange("Birthday Month", 1, 12)
+    info_app.addLabelSpinBoxRange("Birthday Day", 1, 31)
+    info_app.addLabelNumericEntry("Birthday Year")
     info_app.addLabelEntry("Email")
-    info_app.addLabelEntry("Phone Number")
+    info_app.addLabelNumericEntry("Phone Number(Digits only!)")
     info_app.addButtons(["Submit", "Cancel"], press_athlete)
     info_app.go()
 
