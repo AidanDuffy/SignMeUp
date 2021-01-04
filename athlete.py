@@ -9,7 +9,7 @@ and their YMCA barcode ID number.
 
 class Athlete:
 
-    def __init__(self, sign_in_url, barcode, location, first, last, month, day,
+    def __init__(self, area_id, barcode, location, first, last, month, day,
                  year, email, phone):
         """
         This is the constructor for the athlete class.
@@ -26,7 +26,7 @@ class Athlete:
         :param email: is the user's email
         :param phone: is the user's phone
         """
-        self.url = sign_in_url
+        self.area_id = area_id
         self.__id = barcode
         self.location = location
         self.first = first

@@ -5,13 +5,13 @@ Last Updated: January 2, 2021
 Description: This program aids swimmers in scheduling/booking lap swim times
 for local YMCAs in the northern New Jersey area.
 """
-from webbrowser import Chrome
+import os
 
 import appJar
 import requests
-from lxml import html
-from selenium.webdriver.support.ui import Select
 from selenium import webdriver
+from selenium.webdriver.support.select import Select
+
 from athlete import Athlete
 
 info_app = appJar.gui("YMCA Sign-in and Personal Info", "600x600")
@@ -38,6 +38,7 @@ def check_user_info():
                 check_user_info()
             else:
                 return get_barcode_info()
+        url = "https://operations.daxko.com/online/5029/checkin?area_id="
         athlete = Athlete(info[0], int(info[1]), info[2], info[3], info[4],
                           int(info[5]), int(info[6]), int(info[7]), info[8],
                           info[9])
@@ -58,7 +59,10 @@ def press(button):
     elif button == "Submit":
         user_info = open("user_info.txt", "w")
         while True:
-            url = info_app.getEntry("Barcode URL(daxko.com)")
+            area_id = info_app.getEntry("Area ID(4-digits at end of Virtual"
+                                        " Check In URL)")
+            url = "https://operations.daxko.com/online/5029/checkin?area_id=" \
+                  + area_id
             barcode = int(info_app.getEntry("Barcode ID"))
             barcode = str(barcode)
             try:
@@ -79,7 +83,7 @@ def press(button):
             else:
 
                 break
-        user_info.write(url + "\n" + barcode + "\n")
+        user_info.write(area_id + "\n" + barcode + "\n")
         user_info.close()
         info_app.stop()
 
@@ -105,7 +109,7 @@ def get_barcode_info():
     """
     info_app.addLabel("title",
                       "Please provide your YMCA and login information")
-    info_app.addLabelEntry("Barcode URL(daxko.com)")
+    info_app.addLabelEntry("Area ID(4-digits at end of Virtual Check In URL)")
     info_app.addNumericLabelEntry("Barcode ID")
     info_app.setFocus("Barcode URL(daxko.com)")
     info_app.addButtons(["Submit", "Cancel"], press)
@@ -128,11 +132,14 @@ def get_athlete_info():
     for line in user_info:
         info.append(line[:len(line) - 1])
     user_info.close()
-    page = submit_barcode(info[0], info[1])
-    test = html.fromstring(page.text)
-    driver = Chrome()
+    url = "https://operations.daxko.com/online/5029/checkin?area_id=" + info[0]
+    page = submit_barcode(url, info[1])
+    path, file = os.path.split(os.path.realpath(__file__))
+    chrome_path = path + "\\chromedriver.exe"
+    driver = webdriver.Chrome(executable_path=chrome_path)
     driver.get(page.url)
-    selector = Select(driver.find_element_by_id('location'))
+    selector = Select(driver.find_element_by_name('location'))
+    print(selector.options)
     info_app.addLabelEntry("")
     info_app.addLabelEntry("First Name")
     info_app.addLabelEntry("Last Name")
