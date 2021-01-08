@@ -295,18 +295,20 @@ def book_it():
         fieldset = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
                                                 "div[3]/fieldset[" +
                                                 str(count) + "]")
-        count += 1
         driver_class = Select(fieldset.find_element_by_class_name("time"))
         times = driver_class.options
         for cur_times in times:
             if final_time in cur_times.text:
                 driver_class.select_by_visible_text(final_time)
-                submit = fieldset.find_element_by_class_name("cancel-button"
-                                                             " book-btn self-"
-                                                             "sched-input")
+                submit = fieldset.find_element_by_xpath("/html/body/div/div/div"
+                                                        "[1]/div[3]/fieldset["
+                                                        + str(count) + "]/table/"
+                                                        "tbody/tr[5]/td/div"
+                                                                  "/button")
                 submit.click()
                 driver.implicitly_wait(20)
                 return
+        count += 1
 
 
 def main():
