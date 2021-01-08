@@ -8,6 +8,7 @@ for local YMCAs in the northern New Jersey area.
 import os
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 from seleniumrequests import Chrome
 import appJar
 import requests
@@ -20,6 +21,8 @@ info_app = appJar.gui("YMCA Sign-in and Personal Info", "800x800")
 weekdays = {0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday",
             4: "Friday",
             5: "Saturday", 6: "Sunday"}
+months = {1:"Jan",2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',
+          7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'}
 
 
 def check_user_info():
@@ -272,6 +275,19 @@ def book_it():
         input_element = driver.find_element_by_id(key)
         input_element.send_keys(data[key])
     input_element.submit()
+    res_date = today + timedelta(days=7)
+    day = str(res_date.day)
+    if len(day) == 1:
+        day = "0" + day
+    full_date = weekday + ", " + months[res_date.month] + " " + day
+    selector = Select(driver.find_element_by_id("date-filter"))
+    selector.select_by_visible_text(full_date)
+    selector = Select(driver.find_element_by_id("appointment-type-filter"))
+    selector.select_by_visible_text("Lap Swimming")
+    input_element = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
+                                                 "div[2]/input[1]")
+    input_element.click()
+    driver.implicitly_wait(10)
     print("test")
 
 
