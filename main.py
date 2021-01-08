@@ -15,7 +15,7 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
 
-from athlete import Athlete
+from athlete import *
 
 info_app = appJar.gui("YMCA Sign-in and Personal Info", "800x800")
 weekdays = {0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday",
