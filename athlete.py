@@ -10,7 +10,7 @@ and their YMCA barcode ID number.
 class Athlete:
 
     def __init__(self, area_id, barcode, location, first, last, month, day,
-                 year, email, phone):
+                 year, email, phone, url = ""):
         """
         This is the constructor for the athlete class.
         :param sign_in_url: is the url where the athlete normally inputs their
@@ -36,6 +36,7 @@ class Athlete:
         self.year = year
         self.email = email
         self.phone = phone
+        self.url = url
 
     def set_barcode(self, barcode):
         """
@@ -51,3 +52,18 @@ class Athlete:
         :return: the barcode ID number for this athlete.
         """
         return self.__id
+
+    def set_url(self, url):
+        """
+        This sets the url for booking times on the YMCA website.
+        :param url: is the url
+        :return: none
+        """
+        self.url = url
+
+    def get_url(self):
+        """
+        This returns the url for booking YMCA times.
+        :return: the url.
+        """
+        return self.url

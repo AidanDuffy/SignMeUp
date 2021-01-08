@@ -34,7 +34,7 @@ def check_user_info():
         for line in user_info:
             info.append(line[:len(line) - 1])
         user_info.close()
-        if len(info) != 10:
+        if len(info) != 11:
             if len(info) == 2:
                 info_app.stop()
                 get_athlete_info()
@@ -44,7 +44,7 @@ def check_user_info():
         url = "https://operations.daxko.com/online/5029/checkin?area_id="
         athlete = Athlete(info[0], int(info[1]), info[2], info[3], info[4],
                           info[5], int(info[6]), int(info[7]), info[8],
-                          int(info[9]))
+                          int(info[9]), info[10])
         return athlete
     else:
         return False
@@ -207,7 +207,7 @@ def get_athlete_info():
                 break
             user_info.write(loc + "\n" + first + "\n" + last + "\n" + month
                             + "\n" + day + "\n" + str(year) + "\n"
-                            + email + "\n" + str(number))
+                            + email + "\n" + str(number) + "\n" + page.url)
             user_info.close()
             info_app.stop()
 
@@ -229,6 +229,38 @@ def submit_barcode(url, barcode):
                                        "barcode": int(barcode)},
                         allow_redirects=True)
     return page
+
+
+def book_it():
+    """
+    This uses all of the aggregated data and input of time to book the user's
+    next swim time.
+    :return: None
+    """
+    reservation = open("res.txt", "r")
+    res_time = reservation.read()
+    reservation.close()
+    athlete = check_user_info()
+    today = date.today()
+    weekday = weekdays[today.weekday()][:3]
+    now = datetime.now()
+    current_time = now.strftime("%H%M")
+    print(current_time)
+    url = athlete.get_url()
+    while current_time != res_time:
+        now = datetime.now()
+        current_time = now.strftime("%H%M")
+    path, file = os.path.split(os.path.realpath(__file__))
+    chrome_path = path + "\\chromedriver.exe"
+    driver = webdriver.Chrome(executable_path=chrome_path)
+    driver.get(url)
+    driver.implicitly_wait(1)
+    src = driver.find_element_by_xpath("/html/body/div[7]"
+                                        "/div/div[2]/div"
+                                        "[2]/div/div[2]"
+                                        "/p/iframe").get_attribute("src")
+    selector = Select(driver.find_element_by_id("location"))
+
 
 
 def main():
@@ -300,6 +332,7 @@ def main():
     else:
         res_date = str(today_date)
     res_date = today.__str__()[:-2] + res_date
+    book_it()
 
 
 if __name__ == '__main__':
