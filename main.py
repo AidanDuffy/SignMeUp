@@ -5,10 +5,10 @@ Last Updated: January 2, 2021
 Description: This program aids swimmers in scheduling/booking lap swim times
 for local YMCAs in the northern New Jersey area.
 """
-from datetime import datetime
 import os
 from datetime import date
-
+from datetime import datetime
+from seleniumrequests import Chrome
 import appJar
 import requests
 from selenium import webdriver
@@ -17,8 +17,10 @@ from selenium.webdriver.support.select import Select
 from athlete import Athlete
 
 info_app = appJar.gui("YMCA Sign-in and Personal Info", "800x800")
-weekdays = {0:"Monday", 1:"Tuesday", 2:"Wednesday", 3:"Thursday", 4:"Friday",
-            5:"Saturday", 6:"Sunday"}
+weekdays = {0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday",
+            4: "Friday",
+            5: "Saturday", 6: "Sunday"}
+
 
 def check_user_info():
     """
@@ -245,7 +247,6 @@ def book_it():
     weekday = weekdays[today.weekday()][:3]
     now = datetime.now()
     current_time = now.strftime("%H%M")
-    print(current_time)
     url = athlete.get_url()
     while current_time != res_time:
         now = datetime.now()
@@ -256,11 +257,22 @@ def book_it():
     driver.get(url)
     driver.implicitly_wait(1)
     src = driver.find_element_by_xpath("/html/body/div[7]"
-                                        "/div/div[2]/div"
-                                        "[2]/div/div[2]"
-                                        "/p/iframe").get_attribute("src")
+                                       "/div/div[2]/div"
+                                       "[2]/div/div[2]"
+                                       "/p/iframe").get_attribute("src")
+    driver.get(src)
+    data = {'first_name':athlete.first,'last_name':athlete.last,
+            'dob_day':athlete.day,'dob_year':athlete.year,
+            'email':athlete.email,'phone':athlete.phone}
     selector = Select(driver.find_element_by_id("location"))
-
+    selector.select_by_visible_text(athlete.location)
+    selector = Select(driver.find_element_by_id("dob_month"))
+    selector.select_by_visible_text(athlete.month)
+    for key in data:
+        input_element = driver.find_element_by_id(key)
+        input_element.send_keys(data[key])
+    input_element.submit()
+    print("test")
 
 
 def main():
@@ -276,6 +288,7 @@ def main():
                       "What time next " + weekday + " after " + current_time +
                       " do\n you want to make your reservation?")
     info_app.addLabelNumericEntry("Time (HHMM, military style)")
+
     def press_res(button):
         """
         This is the function that executes a button push for athlete info
@@ -293,19 +306,23 @@ def main():
                 if len(time) == 3:
                     time = "0" + time
                 if len(time) != 4:
-                    if info_app.retryBox("Error","Please enter a valid time!"):
+                    if info_app.retryBox("Error",
+                                         "Please enter a valid time!"):
                         info_app.go()
                 hour = time[:2]
                 min = time[2:]
-                if int(hour)>23 or int(hour)<0 or int(min)>59 or int(min)<0:
-                    if info_app.retryBox("Error","Please enter a valid time!"):
+                if int(hour) > 23 or int(hour) < 0 or int(min) > 59 or int(
+                        min) < 0:
+                    if info_app.retryBox("Error",
+                                         "Please enter a valid time!"):
                         info_app.go()
                 if int(hour) <= int(current_time[:2]) and int(min) < int(
                         current_time[2:]):
-                    if info_app.retryBox("Error","Please enter a valid time!"):
+                    if info_app.retryBox("Error",
+                                         "Please enter a valid time!"):
                         info_app.go()
                 break
-            reservation = open("res.txt","w")
+            reservation = open("res.txt", "w")
             reservation.write(hour + min)
             reservation.close()
             info_app.stop()
@@ -323,8 +340,6 @@ def main():
     else:
         am_or_pm = "AM"
     res_time = hour + ":" + mins + " " + am_or_pm
-    #res_date =
-    print(res_time)
     today_date = int(today.__str__()[-2:])
     today_date += 7
     if today_date < 10:
