@@ -9,7 +9,6 @@ import os
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-from seleniumrequests import Chrome
 import appJar
 import requests
 from selenium import webdriver
@@ -30,11 +29,11 @@ def check_user_info():
     This checks whether or not the user info file has already been populated
     :return: True or False depending on the file's contents.
     """
-    user_info = open("user_info.txt", "w+")
+    user_info = open("user_info.txt", "r")
     file_len = len(user_info.read())
     user_info.close()
     if file_len != 0:
-        user_info = open("user_info.txt", "w+")
+        user_info = open("user_info.txt", "r")
         info = list()
         for line in user_info:
             info.append(line[:len(line) - 1])
@@ -126,14 +125,14 @@ def get_athlete_info():
     info_app.setFont(20)
     info_app.addLabel("title",
                       "Please provide your personal information below:")
-    user_info = open("user_info.txt", "w+")
+    user_info = open("user_info.txt", "r")
     info = list()
     for line in user_info:
         info.append(line[:len(line) - 1])
     user_info.close()
     url = "https://operations.daxko.com/online/5029/checkin?area_id=" + info[0]
     page = submit_barcode(url, info[1])
-    location_file = open("locations.txt", "w+")
+    location_file = open("locations.txt", "r")
     locations = list()
     if len(location_file.read()) == 0:
         location_file = open("locations.txt", "w")
@@ -153,7 +152,7 @@ def get_athlete_info():
             location_file.write(option.text + "\n")
         driver.close()
     else:
-        location_file = open("locations.txt", "w+")
+        location_file = open("locations.txt", "r")
         for line in location_file:
             locations.append(line)
     location_file.close()
@@ -242,7 +241,7 @@ def book_it():
     next swim time.
     :return: None
     """
-    reservation = open("res.txt", "w+")
+    reservation = open("res.txt", "r")
     res_time = reservation.read()
     reservation.close()
     athlete = check_user_info()
@@ -365,7 +364,7 @@ def main():
 
     info_app.addButtons(["Submit", "Cancel"], press_res)
     info_app.go()
-    reservation = open("res.txt", "w+")
+    reservation = open("res.txt", "r")
     res_time = reservation.read()
     hour = res_time[:2]
     mins = res_time[2:]

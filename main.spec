@@ -4,9 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\Aidan\\Side Projects\\SignMeUp'],
-             binaries=[],
-             datas=[],
+             pathex=['G:\\Side Projects\\SignMeUp','C:\\Users\\Duff\\Desktop\\Python\\venv\\Lib\\site-packages'],
+             binaries=[('chromedriver.exe','.')],
+             datas=[('user_info.txt','.'),('locations.txt','.'),('res.txt','.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
