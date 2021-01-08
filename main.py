@@ -254,6 +254,7 @@ def book_it():
     while current_time != res_time:
         now = datetime.now()
         current_time = now.strftime("%H%M")
+    final_time = now.strftime("%I:%M %p")
     path, file = os.path.split(os.path.realpath(__file__))
     chrome_path = path + "\\chromedriver.exe"
     driver = webdriver.Chrome(executable_path=chrome_path)
@@ -288,7 +289,24 @@ def book_it():
                                                  "div[2]/input[1]")
     input_element.click()
     driver.implicitly_wait(10)
-    print("test")
+    count = 1
+    final_time = "7:00 PM"
+    while True:
+        fieldset = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
+                                                "div[3]/fieldset[" +
+                                                str(count) + "]")
+        count += 1
+        driver_class = Select(fieldset.find_element_by_class_name("time"))
+        times = driver_class.options
+        for cur_times in times:
+            if final_time in cur_times.text:
+                driver_class.select_by_visible_text(final_time)
+                submit = fieldset.find_element_by_class_name("cancel-button"
+                                                             " book-btn self-"
+                                                             "sched-input")
+                submit.click()
+                driver.implicitly_wait(20)
+                return
 
 
 def main():
