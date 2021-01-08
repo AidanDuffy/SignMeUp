@@ -3,3 +3,4 @@
 [0107/222654.597:ERROR:exception_snapshot_win.cc(99)] thread ID 3444 not found in process
 [0107/223610.690:ERROR:directory_reader_win.cc(43)] FindFirstFile: The system cannot find the path specified. (0x3)
 [0107/225634.909:ERROR:directory_reader_win.cc(43)] FindFirstFile: The system cannot find the path specified. (0x3)
+[0108/091000.638:ERROR:directory_reader_win.cc(43)] FindFirstFile: The system cannot find the path specified. (0x3)

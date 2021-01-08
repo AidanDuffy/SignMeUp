@@ -11,6 +11,7 @@ from datetime import datetime
 from datetime import timedelta
 import appJar
 import requests
+import time
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
 
@@ -288,8 +289,8 @@ def book_it():
                                                  "div[2]/input[1]")
     input_element.click()
     driver.implicitly_wait(10)
+    time.sleep(15)
     count = 1
-    final_time = "7:00 PM"
     while True:
         fieldset = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
                                                 "div[3]/fieldset[" +
@@ -323,7 +324,7 @@ def main():
                       "What time next " + weekday + " after " + current_time +
                       " do\n you want to make your reservation?")
     info_app.addLabelNumericEntry("Time (HHMM, military style)")
-
+    current_time_military = now.strftime("%H%M")
     def press_res(button):
         """
         This is the function that executes a button push for athlete info
@@ -351,8 +352,8 @@ def main():
                     if info_app.retryBox("Error",
                                          "Please enter a valid time!"):
                         info_app.go()
-                if int(hour) <= int(current_time[:2]) and int(min) < int(
-                        current_time[2:]):
+                if int(hour) <= int(current_time_military[:2]) and int(min) < int(
+                        current_time_military[2:]):
                     if info_app.retryBox("Error",
                                          "Please enter a valid time!"):
                         info_app.go()
