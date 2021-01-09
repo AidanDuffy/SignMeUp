@@ -259,12 +259,14 @@ def book_it():
     chrome_path = path + "\\chromedriver.exe"
     driver = webdriver.Chrome(executable_path=chrome_path)
     driver.get(url)
-    driver.implicitly_wait(1)
+    driver.implicitly_wait(5)
     src = driver.find_element_by_xpath("/html/body/div[7]"
                                        "/div/div[2]/div"
                                        "[2]/div/div[2]"
                                        "/p/iframe").get_attribute("src")
+    driver.implicitly_wait(5)
     driver.get(src)
+    driver.implicitly_wait(5)
     data = {'first_name':athlete.first,'last_name':athlete.last,
             'dob_day':athlete.day,'dob_year':athlete.year,
             'email':athlete.email,'phone':athlete.phone}
@@ -276,6 +278,7 @@ def book_it():
         input_element = driver.find_element_by_id(key)
         input_element.send_keys(data[key])
     input_element.submit()
+    driver.implicitly_wait(5)
     res_date = today + timedelta(days=7)
     day = str(res_date.day)
     if len(day) == 1:
