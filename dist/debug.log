@@ -1,0 +1,15 @@
+[0108/051001.254:ERROR:directory_reader_win.cc(43)] FindFirstFile: The system cannot find the path specified. (0x3)
+[0108/150414.032:ERROR:process_reader_win.cc(123)] NtOpenThread: {Access Denied} A process has requested access to an object, but has not been granted those access rights. (0xc0000022)
+[0108/150414.033:ERROR:exception_snapshot_win.cc(99)] thread ID 15704 not found in process
+[0108/150414.061:ERROR:process_reader_win.cc(123)] NtOpenThread: {Access Denied} A process has requested access to an object, but has not been granted those access rights. (0xc0000022)
+[0108/150414.061:ERROR:exception_snapshot_win.cc(99)] thread ID 13672 not found in process
+[0108/190251.692:ERROR:process_reader_win.cc(123)] NtOpenThread: {Access Denied} A process has requested access to an object, but has not been granted those access rights. (0xc0000022)
+[0108/190256.711:ERROR:process_reader_win.cc(123)] NtOpenThread: {Access Denied} A process has requested access to an object, but has not been granted those access rights. (0xc0000022)
+[0108/190311.907:ERROR:exception_snapshot_win.cc(99)] thread ID 2620 not found in process
+[0108/190311.907:ERROR:exception_snapshot_win.cc(99)] thread ID 18844 not found in process
+[0108/190311.907:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: An attempt was made to access an exiting process. (0xc000010a)
+[0108/190311.907:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: An attempt was made to access an exiting process. (0xc000010a)
+[0108/190538.549:ERROR:process_reader_win.cc(123)] NtOpenThread: {Access Denied} A process has requested access to an object, but has not been granted those access rights. (0xc0000022)
+[0108/190538.549:ERROR:exception_snapshot_win.cc(99)] thread ID 8020 not found in process
+[0108/190538.580:ERROR:process_reader_win.cc(123)] NtOpenThread: {Access Denied} A process has requested access to an object, but has not been granted those access rights. (0xc0000022)
+[0108/190538.580:ERROR:exception_snapshot_win.cc(99)] thread ID 2132 not found in process

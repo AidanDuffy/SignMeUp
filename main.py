@@ -288,8 +288,8 @@ def book_it():
     input_element = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
                                                  "div[2]/input[1]")
     input_element.click()
-    driver.implicitly_wait(10)
-    time.sleep(15)
+    driver.implicitly_wait(20)
+    time.sleep(20)
     count = 1
     while True:
         fieldset = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
