@@ -292,7 +292,7 @@ def book_it():
                                                  "div[2]/input[1]")
     input_element.click()
     driver.implicitly_wait(20)
-    time.sleep(20)
+    time.sleep(40)
     count = 1
     while True:
         fieldset = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
