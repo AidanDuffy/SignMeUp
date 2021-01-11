@@ -304,7 +304,7 @@ def book_it():
         time.sleep(2)
         times = driver_class.options
         for cur_times in times:
-            if final_time in cur_times.text:
+            if final_time == cur_times.text:
                 driver_class.select_by_visible_text(final_time)
                 driver.implicitly_wait(5)
                 submit = fieldset.find_element_by_xpath("/html/body/div/div/div"
