@@ -298,16 +298,21 @@ def book_it():
         fieldset = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
                                                 "div[3]/fieldset[" +
                                                 str(count) + "]")
+        driver.implicitly_wait(5)
+        time.sleep(1)
         driver_class = Select(fieldset.find_element_by_class_name("time"))
+        time.sleep(2)
         times = driver_class.options
         for cur_times in times:
             if final_time in cur_times.text:
                 driver_class.select_by_visible_text(final_time)
+                driver.implicitly_wait(5)
                 submit = fieldset.find_element_by_xpath("/html/body/div/div/div"
                                                         "[1]/div[3]/fieldset["
                                                         + str(count) + "]/table/"
                                                         "tbody/tr[5]/td/div"
                                                                   "/button")
+                driver.implicitly_wait(5)
                 submit.click()
                 driver.implicitly_wait(20)
                 return
