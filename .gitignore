@@ -4,5 +4,5 @@
 user_info.txt
 res.txt
 locations.txt
-*build/
-*dist/
+build/
+dist/
