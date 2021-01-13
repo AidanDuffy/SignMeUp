@@ -20,3 +20,4 @@ This program will automate the signup process so these atheletes do not need to
 concern themselves with the administrative side of the process.
 
 ## Installation Guide
+Download the SignMeUpSwim.zip file in the main directory. From there, run the main.exe file twice: once to input your personal information, then you will need to run it a second time (and any other time) you wish to have the program book a time for you. Currently it only supports booking times the same day, so it is suggested that you set it up for your desired time prior to departing for the Y.
