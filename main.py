@@ -12,6 +12,7 @@ from datetime import timedelta
 import appJar
 import requests
 import time
+from selenium import common
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
 
@@ -267,6 +268,8 @@ def book_it():
     driver.implicitly_wait(5)
     driver.get(src)
     driver.implicitly_wait(5)
+    driver.get(src)
+    driver.implicitly_wait(5)
     data = {'first_name':athlete.first,'last_name':athlete.last,
             'dob_day':athlete.day,'dob_year':athlete.year,
             'email':athlete.email,'phone':athlete.phone}
@@ -291,33 +294,50 @@ def book_it():
     input_element = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
                                                  "div[2]/input[1]")
     input_element.click()
-    driver.implicitly_wait(20)
-    time.sleep(40)
-    count = 1
-    while True:
-        fieldset = driver.find_element_by_xpath("/html/body/div/div/div[1]/"
-                                                "div[3]/fieldset[" +
-                                                str(count) + "]")
-        driver.implicitly_wait(5)
-        time.sleep(1)
-        driver_class = Select(fieldset.find_element_by_class_name("time"))
+    if final_time[:1] == "0":
+        final_time = final_time[1:]
+    if booking(driver, final_time) is False:
+        book_it()
+    return
+
+
+def booking(driver, final_time):
+    """
+
+    :param driver:
+    :return:
+    """
+    count = 12
+    while count > 0:
         time.sleep(2)
+        try:
+            fieldset = driver.find_element_by_xpath(
+                "/html/body/div/div/div[1]/"
+                "div[3]/fieldset[" +
+                str(count) + "]")
+            driver.implicitly_wait(40)
+        except common.exceptions.NoSuchElementException:
+            count -= 1
+            continue
+        driver_class = Select(fieldset.find_element_by_class_name("time"))
         times = driver_class.options
         for cur_times in times:
+            print(final_time, cur_times.text)
             if final_time == cur_times.text:
                 driver_class.select_by_visible_text(final_time)
                 driver.implicitly_wait(5)
-                submit = fieldset.find_element_by_xpath("/html/body/div/div/div"
-                                                        "[1]/div[3]/fieldset["
-                                                        + str(count) + "]/table/"
-                                                        "tbody/tr[5]/td/div"
-                                                                  "/button")
+                submit = fieldset.find_element_by_xpath(
+                    "/html/body/div/div/div"
+                    "[1]/div[3]/fieldset["
+                    + str(count) + "]/table/"
+                                   "tbody/tr[5]/td/div"
+                                   "/button")
                 driver.implicitly_wait(5)
                 submit.click()
-                driver.implicitly_wait(20)
-                return
-        count += 1
-
+                time.sleep(10)
+                return True
+        count -= 1
+    return False
 
 def main():
     athlete = check_user_info()
