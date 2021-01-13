@@ -322,7 +322,6 @@ def booking(driver, final_time):
         driver_class = Select(fieldset.find_element_by_class_name("time"))
         times = driver_class.options
         for cur_times in times:
-            print(final_time, cur_times.text)
             if final_time == cur_times.text:
                 driver_class.select_by_visible_text(final_time)
                 driver.implicitly_wait(5)
