@@ -26,6 +26,19 @@ months = {1:"Jan",2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',
           7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'}
 
 
+def check_user_info_length():
+    """
+    This checks the number of lines in the user info file.
+    :return: the number of lines in user_info.txt
+    """
+    user_info = open("user_info.txt", "r")
+    info = 0
+    for line in user_info:
+        info += 1
+    user_info.close()
+    return info
+
+
 def check_user_info():
     """
     This checks whether or not the user info file has already been populated
@@ -45,6 +58,10 @@ def check_user_info():
                 info_app.stop()
                 get_athlete_info()
                 check_user_info()
+                user_info = open("user_info.txt", "r")
+                info = list()
+                for line in user_info:
+                    info.append(line[:len(line) - 1])
             else:
                 return get_barcode_info()
         url = "https://operations.daxko.com/online/5029/checkin?area_id="
@@ -237,24 +254,32 @@ def submit_barcode(url, barcode):
     return page
 
 
-def book_it():
+def book_it(tomorrow):
     """
     This uses all of the aggregated data and input of time to book the user's
     next swim time.
+    :param tomorrow: True if the program needs to run for the next day.
     :return: None
     """
     reservation = open("res.txt", "r")
-    res_time = reservation.read()
+    res_time = reservation.readline()[:4]
     reservation.close()
     athlete = check_user_info()
     today = date.today()
-    weekday = weekdays[today.weekday()][:3]
+    if tomorrow:
+        weekday = weekdays[(today.weekday() + 1)%7][:3]
+        weekday_int = (today.weekday() + 1) % 7
+    else:
+        weekday = weekdays[today.weekday()][:3]
+        weekday_int = (today.weekday()) % 7
     now = datetime.now()
     current_time = now.strftime("%H%M")
     url = athlete.get_url()
-    while current_time != res_time:
+    current_day = now.weekday()
+    while current_time != res_time and current_day != weekday_int:
         now = datetime.now()
         current_time = now.strftime("%H%M")
+        current_day = now.weekday()
     final_time = now.strftime("%I:%M %p")
     path, file = os.path.split(os.path.realpath(__file__))
     chrome_path = path + "\\chromedriver.exe"
@@ -339,18 +364,22 @@ def booking(driver, final_time):
     return False
 
 def main():
+    user_info_len = check_user_info_length()
     athlete = check_user_info()
     if athlete is False:
         athlete = get_barcode_info()
     today = date.today()
     now = datetime.now()
     weekday = weekdays[today.weekday()]
+    tomorrow = weekdays[(today.weekday() + 1)%7]
     current_time = now.strftime("%I:%M %p")
     info_app.setFont(20)
     info_app.addLabel("title",
-                      "What time next " + weekday + " after " + current_time +
+                      "What time next " + weekday + " or " + tomorrow
+                      + " after " + current_time +
                       " do\n you want to make your reservation?")
     info_app.addLabelNumericEntry("Time (HHMM, military style)")
+    info_app.addCheckBox("Run Tomorrow?")
     current_time_military = now.strftime("%H%M")
     def press_res(button):
         """
@@ -366,6 +395,8 @@ def main():
             while True:
                 time = str(int(info_app.getEntry("Time (HHMM, military"
                                                  " style)")))
+                tom = info_app.getCheckBox("Run Tomorrow?")
+                tom_str = str(tom)
                 if len(time) == 3:
                     time = "0" + time
                 if len(time) != 4:
@@ -379,21 +410,23 @@ def main():
                     if info_app.retryBox("Error",
                                          "Please enter a valid time!"):
                         info_app.go()
-                if int(hour) <= int(current_time_military[:2]) and int(min) < int(
-                        current_time_military[2:]):
+                if tom is False and int(hour) <= int(current_time_military[:2])\
+                        and int(min) < int(current_time_military[2:]):
                     if info_app.retryBox("Error",
                                          "Please enter a valid time!"):
                         info_app.go()
                 break
             reservation = open("res.txt", "w")
             reservation.write(hour + min)
+            reservation.write("\n" + tom_str)
             reservation.close()
             info_app.stop()
 
     info_app.addButtons(["Submit", "Cancel"], press_res)
     info_app.go()
     reservation = open("res.txt", "r")
-    res_time = reservation.read()
+    res_time = reservation.readline()
+    tomorrow = bool(reservation.readline())
     hour = res_time[:2]
     mins = res_time[2:]
     if int(hour) >= 12:
@@ -410,7 +443,7 @@ def main():
     else:
         res_date = str(today_date)
     res_date = today.__str__()[:-2] + res_date
-    book_it()
+    book_it(tomorrow)
 
 
 if __name__ == '__main__':
