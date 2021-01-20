@@ -276,10 +276,12 @@ def book_it(tomorrow):
     current_time = now.strftime("%H%M")
     url = athlete.get_url()
     current_day = now.weekday()
-    while current_time != res_time and current_day != weekday_int:
+    while current_time != res_time or current_day != weekday_int:
         now = datetime.now()
         current_time = now.strftime("%H%M")
         current_day = now.weekday()
+        if current_day != weekday_int:
+            time.sleep(18000) #Wait 5 hours
     final_time = now.strftime("%I:%M %p")
     path, file = os.path.split(os.path.realpath(__file__))
     chrome_path = path + "\\chromedriver.exe"
@@ -426,7 +428,11 @@ def main():
     info_app.go()
     reservation = open("res.txt", "r")
     res_time = reservation.readline()
-    tomorrow = bool(reservation.readline())
+    tomorrow = reservation.readline()
+    if tomorrow == "False":
+        tomorrow = False
+    else:
+        tomorrow = True
     hour = res_time[:2]
     mins = res_time[2:]
     if int(hour) >= 12:
